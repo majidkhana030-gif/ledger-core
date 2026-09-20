@@ -5,16 +5,29 @@ import com.assignment.ledger.model.EventType;
 import com.assignment.ledger.model.Money;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 public class BalanceCalculator {
 
+
     public Money calculate(
-            List<Event> events, String currency
+            List<Event> events,
+            LocalDate closingDate,
+            String accountId,
+            String currency
     ) {
         BigDecimal balance = BigDecimal.ZERO;
 
         for (Event event : events) {
+            if (!event.accountId().equals(accountId)) {
+                continue;
+            }
+
+            if (event.valueDate().isAfter(closingDate)) {
+                continue;
+            }
+
             if (event.type() == EventType.CREDIT) {
                 balance = balance.add(event.amount().amount());
             } else if (event.type() == EventType.DEBIT) {
